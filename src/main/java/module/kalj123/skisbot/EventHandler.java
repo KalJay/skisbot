@@ -10,6 +10,7 @@ import sx.blah.discord.handle.obj.*;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.MissingPermissionsException;
 import sx.blah.discord.util.RateLimitException;
+import sx.blah.discord.util.audio.events.TrackFinishEvent;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
@@ -19,6 +20,7 @@ import java.util.List;
 public class EventHandler {
 
     private boolean busy;
+    private IVoiceChannel channel;
 
 
     @EventSubscriber
@@ -29,50 +31,45 @@ public class EventHandler {
     }
 
     @EventSubscriber
+    public void onTrackFinishEvent(TrackFinishEvent event) {
+        busy = false;
+        channel.leave();
+    }
+
+    @EventSubscriber
     public void onMessageEvent(MessageReceivedEvent event) throws IOException, DiscordException, MissingPermissionsException, RateLimitException, UnsupportedAudioFileException, InterruptedException {
         if (!busy) {
             if (event.getMessage().getContent().equals("!skis")) {
-                busy = true;
-                playVoice(event, "src/main/resources/skis.wav", 2000);
-                busy = false;
+                playVoice(event, "src/main/resources/skis.wav");
             }
 
             if (event.getMessage().getContent().equals("!skislongthisisalljusttodiscouragespamandtopreventoverusekthanksbailolrektming")) {
-                busy = true;
-                playVoice(event, "src/main/resources/skislong.wav", 20000);
-                busy = false;
+                playVoice(event, "src/main/resources/skislong.wav");
             }
 
             if (event.getMessage().getContent().equals("!jesus")) {
-                busy = true;
-                playVoice(event, "src/main/resources/jesus.wav", 3000);
-                busy = false;
+                playVoice(event, "src/main/resources/jesus.wav");
             }
 
             if (event.getMessage().getContent().equals("!shame")) {
-                busy = true;
-                playVoice(event, "src/main/resources/shame.mp3", 7000);
+                playVoice(event, "src/main/resources/shame.mp3");
             }
 
             if (event.getMessage().getContent().equals("!hiitline")) {
-                busy = true;
-                playVoice(event, "src/main/resources/hiitline.mp3", 3000);
-                busy = false;
+                playVoice(event, "src/main/resources/hiitline.mp3");
             }
 
             if (event.getMessage().getContent().equals("!god")) {
-                busy = true;
                 double number = Math.random();
                 if (number < 0.25) {
-                    playVoice(event, "src/main/resources/god1.wav", 5000);
+                    playVoice(event, "src/main/resources/god1.wav");
                 } else if (number < 0.5) {
-                    playVoice(event, "src/main/resources/god2.wav", 5000);
+                    playVoice(event, "src/main/resources/god2.wav");
                 } else if (number < 0.75) {
-                    playVoice(event, "src/main/resources/god3.wav", 5000);
+                    playVoice(event, "src/main/resources/god3.wav");
                 } else {
-                    playVoice(event, "src/main/resources/god4.wav", 5000);
+                    playVoice(event, "src/main/resources/god4.wav");
                 }
-                busy = false;
             }
         } else event.getMessage().delete();
 
@@ -193,16 +190,17 @@ public class EventHandler {
         }
     }
 
-    private void playVoice(MessageReceivedEvent event, String file, int delay) throws InterruptedException, IOException, UnsupportedAudioFileException {
+    private void playVoice(MessageReceivedEvent event, String file) throws InterruptedException, IOException, UnsupportedAudioFileException {
+        busy = true;
         IUser theAuthor = event.getMessage().getAuthor();
         IGuild theGuild = event.getMessage().getGuild();
-        IVoiceChannel channel = theAuthor.getVoiceStateForGuild(theGuild).getChannel();
+        channel = theAuthor.getVoiceStateForGuild(theGuild).getChannel();
         channel.join();
         event.getMessage().delete();
-        Thread.sleep(1000);
+        //Thread.sleep(1000);
         SkisBot.playAudioFromFile(file, theGuild);
-        Thread.sleep(delay);
-        channel.leave();
+        //Thread.sleep(delay);
+        //channel.leave();
     }
 }
 //
