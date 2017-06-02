@@ -15,11 +15,25 @@ import sx.blah.discord.util.audio.events.TrackFinishEvent;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
+import java.lang.String.*;
 
 public class EventHandler {
 
-    private boolean busy;
-    private IVoiceChannel channel;
+    private boolean busy; //flag used to determine if playing sound in voice channel or not
+    private IVoiceChannel channel; //voice channel needs to be set as global so it can be opened in one place and closed in another
+    private LeagueHandler league; //object to handle League integration
+    private final String botChannelId = "319095075994992641"; //Channel to be used for bot only chatter (i.e. League integration output)
+
+    public EventHandler() {
+        try {
+            league = new LeagueHandler();
+            System.out.println("League Handler Online!");
+        } catch (IOException e) {
+            System.out.println("Unable to create League Handler! Error message: " + e.getMessage());
+        }
+
+
+    }
 
 
     @EventSubscriber
@@ -37,6 +51,11 @@ public class EventHandler {
 
     @EventSubscriber
     public void onMessageEvent(MessageReceivedEvent event) throws IOException, DiscordException, MissingPermissionsException, RateLimitException, UnsupportedAudioFileException, InterruptedException {
+
+        if (event.getMessage().getContent().startsWith("!lol")) {
+            league.handler(event);
+        }
+
         if (!busy) {
             if (event.getMessage().getContent().equals("!skis")) {
                 playVoice(event, "src/main/resources/skis.wav");
@@ -200,6 +219,10 @@ public class EventHandler {
         SkisBot.playAudioFromFile(file, theGuild);
         //Thread.sleep(delay);
         //channel.leave();
+    }
+
+    public String getBotChannelId() {
+        return botChannelId;
     }
 }
 //
