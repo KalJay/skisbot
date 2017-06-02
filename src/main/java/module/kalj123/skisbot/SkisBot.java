@@ -4,7 +4,6 @@ import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.events.EventDispatcher;
 import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.modules.IModule;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.audio.AudioPlayer;
 
@@ -15,26 +14,26 @@ import java.io.IOException;
 /**
  * Created by kalj123 on 31/7/2016.
  */
-public class SkisBot implements IModule {
+public class SkisBot {
     public static IDiscordClient discordClient;
 
-    public void disable() {
+    public void disable() {}
 
-    }
     public boolean enable(IDiscordClient dclient) {
         discordClient = dclient;
         EventDispatcher dispatcher = discordClient.getDispatcher();
         dispatcher.registerListener(new EventHandler());
-        return false;
+        return true;
     }
+
     public String getAuthor() {
         return "kalj123";
     }
     public String getMinimumDiscord4JVersion() {
-        return "2.8.1";
+        return "2.8.0";
     }
     public String getName() {
-        return "SKIS Bot";
+        return "SKISBot";
     }
     public String getVersion() {
         return "1.0";
@@ -46,7 +45,7 @@ public class SkisBot implements IModule {
     }
 
     public static IDiscordClient getClient() throws DiscordException {
-        return new ClientBuilder().withToken("MjA4ODg5NzA5MzYxODg5Mjgx.CoEgxA.ZV1wxXT3ORQx6JcILResXg0WUlw").login();
+        return new ClientBuilder().withToken("MjA4OTAxMjEyMzE2MTA2NzUz.CoCNlg.X-FC-9PKvxBQcuzpXUWD2g3M1QU").login();
     }
 
     //credit to oopsjpeg's tutorial at https://github.com/oopsjpeg/d4j-audioplayer
