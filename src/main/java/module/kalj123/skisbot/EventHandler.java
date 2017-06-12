@@ -31,8 +31,6 @@ public class EventHandler {
         } catch (IOException e) {
             System.out.println("Unable to create League Handler! Error message: " + e.getMessage());
         }
-
-
     }
 
 
@@ -41,6 +39,7 @@ public class EventHandler {
         System.out.println("The bot is now ready");
         String currentStatus = randomStatus();
         SkisBot.discordClient.streaming(currentStatus,"");
+        league.startConfig(SkisBot.discordClient.getGuilds());
     }
 
     @EventSubscriber
@@ -54,6 +53,7 @@ public class EventHandler {
 
         if (event.getMessage().getContent().startsWith("!lol")) {
             league.handler(event);
+            event.getMessage().delete();
         }
 
         if (!busy) {
@@ -89,7 +89,10 @@ public class EventHandler {
                     playVoice(event, "src/main/resources/god4.wav");
                 }
             }
-        } else event.getMessage().delete();
+        } else {
+            if(event.getMessage().getContent().startsWith("!"))
+            event.getMessage().delete();
+        }
 
         if (event.getMessage().getContent().equals("!timeforleague")) {
             event.getMessage().getChannel().sendFile(new File("src/main/resources/timeforleague.jpg"));
@@ -149,19 +152,21 @@ public class EventHandler {
         if (event.getMessage().getContent().equals("!help")) {
             IPrivateChannel privateDM = SkisBot.discordClient.getOrCreatePMChannel(event.getMessage().getAuthor());
             event.getMessage().delete();
-            privateDM.sendMessage("!timeforleague - sends time for league picture with mention to @here");
-            privateDM.sendMessage("!skis - skiskiski in voice channel you are currently connected to");
-            privateDM.sendMessage("!jesus - jesus line from idmyt in voice channel you are currently connected to");
-            privateDM.sendMessage("!shame - shame shame shame from idmyt in voice channel you are currently connected to");
-            privateDM.sendMessage("!timeforskis - sends time for skis picture to main chat with no mention");
-            Thread.sleep(5000);
-            privateDM.sendMessage("!rosetta - links them to www.rosettastone.com to help them fix that shit grammar");
-            privateDM.sendMessage("!slashingprices - sends goodguys picture to main chat, ask angus for reasons why");
-            privateDM.sendMessage("!truck - sends the truck into fullview as requested by angus");
-            privateDM.sendMessage("!lizstart - starts a conversation. *Liz style*");
-            privateDM.sendMessage("!god - dominus the touch of god plus an extra 4th line");
-            Thread.sleep(5000);
-            privateDM.sendMessage("!help - this");
+            String helpString = "```";
+            helpString += "\n!timeforleague - sends time for league picture with mention to @here";
+            helpString += "\n!skis - skiskiski in voice channel you are currently connected to";
+            helpString += "\n!jesus - jesus line from idmyt in voice channel you are currently connected to";
+            helpString += "\n!shame - shame shame shame from idmyt in voice channel you are currently connected to";
+            helpString += "\n!timeforskis - sends time for skis picture to main chat with no mention";
+            helpString += "\n!rosetta - links them to www.rosettastone.com to help them fix that shit grammar";
+            helpString += "\n!slashingprices - sends goodguys picture to main chat, ask angus for reasons why";
+            helpString += "\n!truck - sends the truck into fullview as requested by angus";
+            helpString += "\n!lizstart - starts a conversation. *Liz style*";
+            helpString += "\n!god - dominus the touch of god plus an extra 4th line";
+            helpString += "\n!help - this";
+            helpString += "\n!lol help - explanation of league integration commands";
+            helpString += "\n```";
+            privateDM.sendMessage(helpString);
         }
 
         double checknumber = Math.random();

@@ -6,9 +6,14 @@ import com.robrua.orianna.type.core.common.Side;
 import com.robrua.orianna.type.core.currentgame.CurrentGame;
 import com.robrua.orianna.type.core.currentgame.Participant;
 import com.robrua.orianna.type.core.summoner.Summoner;
+import module.kalj123.skisbot.config.Config;
+import module.kalj123.skisbot.config.Players;
 import module.kalj123.skisbot.league.Player;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IPrivateChannel;
+import sx.blah.discord.handle.obj.IUser;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -25,36 +30,45 @@ import java.util.List;
 public class LeagueHandler {
 
 
-    private final String filePath = "src/main/resources/players.txt";
-    private File theFile = new File(filePath);
-    Path file = Paths.get(filePath);
-    private ArrayList<Player> registeredPlayers;
-    Charset utf8 = StandardCharsets.UTF_8;
+
+    private Config config;
+    private Players players;
+
+
 
     public LeagueHandler() throws IOException {
-        registeredPlayers = new ArrayList<Player>();
-        readFile();
+
+        players = new Players();
+
         RiotAPI.setRegion(Region.OCE);
         RiotAPI.setAPIKey("RGAPI-ce2745b8-b516-4ce0-a49f-034dfab0155e");
     }
 
     public void handler(MessageReceivedEvent event) throws IOException {
         String[] args = event.getMessage().getContent().split(" ");
+        IGuild activeGuild = event.getGuild();
         switch(args[1]) {
             case "link":
-                if (addPlayer(event.getAuthor().getName(), event.getAuthor().getDiscriminator(), args[2])) {
-                    event.getChannel().sendMessage("Successfully linked " + event.getAuthor().getName() + " to summoner name " + args[2]);
+                if (players.addPlayer(event.getAuthor().getName(), event.getAuthor().getDiscriminator(), args[2])) {
+                    config.getGuildBotChannel(activeGuild).sendMessage("Successfully linked " + event.getAuthor().getName() + " to summoner name " + args[2]);
                 } else
-                    event.getChannel().sendMessage("You have already registered a Summoner name");
+                    config.getGuildBotChannel(activeGuild).sendMessage("You have already registered a Summoner name");
                 break;
             case "view":
-                event.getChannel().sendMessage(viewGame(args[2]));
+                config.getGuildBotChannel(activeGuild).sendMessage(viewGame(args[2]));
+                break;
+            case "help":
+                help(event.getMessage().getAuthor());
                 break;
             default:
-                help(event.getChannel());
+                unrecognised(config.getGuildBotChannel(activeGuild));
                 break;
         }
 
+    }
+
+    public void startConfig(List<IGuild> guilds) {
+        config = new Config(guilds);
     }
 
     private String viewGame(String name) {
@@ -62,15 +76,14 @@ public class LeagueHandler {
         CurrentGame currentGame;
         String returnString;
         List<Participant> participants = new ArrayList<Participant>();
-        for (Player player : registeredPlayers) {
-            if(RiotAPI.getSummonerByName(name).getID() == player.getSummonerID()) {
-                focusPlayer = RiotAPI.getSummonerByName(name);
-            }
-        }
-        if (focusPlayer == null) {
+
+        if ((focusPlayer = players.getSummonerFromName(name))== null) {
             return "Invalid summoner name";
         }
-        currentGame = focusPlayer.getCurrentGame();
+
+        if ((currentGame = focusPlayer.getCurrentGame()) == null) {
+            return name + " is not currently in a game";
+        }
         returnString = "```\nMap: " + currentGame.getMap() + "\nQueue Type: " + currentGame.getQueueType() + "\nGame Time: " + currentGame.getLength();
         participants = currentGame.getParticipants();
         returnString = returnString.concat("\n\nBLUE TEAM:");
@@ -89,55 +102,17 @@ public class LeagueHandler {
         return returnString = returnString.concat("\n```");
     }
 
-    private void help(IChannel channel) {
+    private void help(IUser user) {
+        IPrivateChannel privateDM = SkisBot.discordClient.getOrCreatePMChannel(user);
+        String helpString = "```";
+        helpString += "\n!lol link <summonerName> - links your discord account with the provided summoner name";
+        helpString += "\n!lol view <summonerName> - provides a short description of the player's current game";
+        helpString += "\n```";
+        privateDM.sendMessage(helpString);
+    }
+
+    private void unrecognised(IChannel channel) {
         channel.sendMessage("Unrecognised LoL command");
-    }
-
-    private boolean addPlayer(String name, String disc, String summonerName) throws IOException {
-        if(!doesPlayerExist(name, disc)) {
-            long summonerID = RiotAPI.getSummonerByName(summonerName).getID();
-            registeredPlayers.add(new Player(name, disc, summonerID));
-            saveFile();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private void readFile() throws IOException {
-        if(!Files.exists(file)) {
-            Files.createFile(file);
-            System.out.println("File Created!");
-        }
-
-        BufferedReader br = new BufferedReader(new FileReader(filePath));
-        String line = null;
-        while ((line = br.readLine()) != null) {
-            String[] lines = line.split(",");
-            registeredPlayers.add(new Player(lines[0], lines[1], Long.parseLong(lines[2])));
-        }
-    }
-
-    private void saveFile() throws IOException {
-
-        List<String> lines = new ArrayList<String>();
-        int count = 0;
-        for (Player player : registeredPlayers) {
-            lines.add(count, player.toString());
-            count++;
-        }
-        Files.write(file, lines, utf8);
-    }
-
-    private boolean doesPlayerExist(String name, String disc) {
-        String entryId = name + disc;
-        for (Player player: registeredPlayers) {
-            String playerId = player.getUsername() + player.getDiscriminator();
-            if (entryId.equals(playerId)) {
-                return true;
-            }
-        }
-        return false;
     }
 }
 
