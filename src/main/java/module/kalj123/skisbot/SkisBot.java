@@ -44,7 +44,7 @@ public class SkisBot {
         discordClient.getDispatcher().registerListener(new EventHandler());
     }
 
-    public static IDiscordClient getClient() throws DiscordException {
+    private static IDiscordClient getClient() throws DiscordException {
         return new ClientBuilder().withToken("MjA4ODg5NzA5MzYxODg5Mjgx.CoEgxA.ZV1wxXT3ORQx6JcILResXg0WUlw").login();
     }
 
