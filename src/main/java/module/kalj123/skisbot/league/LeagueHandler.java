@@ -1,4 +1,4 @@
-package module.kalj123.skisbot;
+package module.kalj123.skisbot.league;
 
 import com.robrua.orianna.api.core.RiotAPI;
 import com.robrua.orianna.type.core.common.Region;
@@ -6,21 +6,15 @@ import com.robrua.orianna.type.core.common.Side;
 import com.robrua.orianna.type.core.currentgame.CurrentGame;
 import com.robrua.orianna.type.core.currentgame.Participant;
 import com.robrua.orianna.type.core.summoner.Summoner;
+import module.kalj123.skisbot.SkisBot;
 import module.kalj123.skisbot.config.Config;
 import module.kalj123.skisbot.config.Players;
-import module.kalj123.skisbot.league.Player;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
-import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IPrivateChannel;
 import sx.blah.discord.handle.obj.IUser;
 
 import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +27,7 @@ public class LeagueHandler {
 
     private Config config;
     private Players players;
+    private LOLAdmin lolAdmin;
 
 
 
@@ -44,7 +39,7 @@ public class LeagueHandler {
         RiotAPI.setAPIKey("RGAPI-ce2745b8-b516-4ce0-a49f-034dfab0155e");
     }
 
-    public void handler(MessageReceivedEvent event) throws IOException {
+    public void handler(MessageReceivedEvent event) {
         String[] args = event.getMessage().getContent().split(" ");
         IGuild activeGuild = event.getGuild();
         switch(args[1]) {
@@ -60,8 +55,14 @@ public class LeagueHandler {
             case "help":
                 help(event.getMessage().getAuthor());
                 break;
+            case "lolAdmin":
+                config.getGuildBotChannel(activeGuild).sendMessage(lolAdmin.handle(args, event.getAuthor(), event.getGuild()));
+                break;
+            case "refresh":
+                config.getGuildBotChannel(activeGuild).sendMessage(refresh());
+                break;
             default:
-                unrecognised(config.getGuildBotChannel(activeGuild));
+                config.getGuildBotChannel(activeGuild).sendMessage(unrecognised());
                 break;
         }
 
@@ -69,6 +70,7 @@ public class LeagueHandler {
 
     public void startConfig(List<IGuild> guilds) {
         config = new Config(guilds);
+        lolAdmin = new LOLAdmin(players, config);
     }
 
     private String viewGame(String name) {
@@ -111,9 +113,16 @@ public class LeagueHandler {
         privateDM.sendMessage(helpString);
     }
 
-    private void unrecognised(IChannel channel) {
-        channel.sendMessage("Unrecognised LoL command");
+    private String unrecognised() {
+        return "Unrecognised LoL command";
     }
+
+    private String refresh() {
+        players = new Players();
+        lolAdmin = new LOLAdmin(players, config);
+        return "Refreshed";
+    }
+
 }
 
 //API key: RGAPI-ce2745b8-b516-4ce0-a49f-034dfab0155e

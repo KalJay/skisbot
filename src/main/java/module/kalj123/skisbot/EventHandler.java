@@ -3,6 +3,7 @@ package module.kalj123.skisbot;
  * Created by kalj123 on 31/7/2016.
  */
 
+import module.kalj123.skisbot.league.LeagueHandler;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
@@ -15,7 +16,6 @@ import sx.blah.discord.util.audio.events.TrackFinishEvent;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
-import java.lang.String.*;
 
 public class EventHandler {
 

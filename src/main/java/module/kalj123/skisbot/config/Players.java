@@ -24,7 +24,7 @@ public class Players {
     private Path playersPath = Paths.get(players);
 
     private ArrayList<Player> registeredPlayers;
-    Charset utf8 = StandardCharsets.UTF_8;
+    private Charset utf8 = StandardCharsets.UTF_8;
 
     public Players() {
         registeredPlayers = new ArrayList<Player>();
@@ -35,7 +35,7 @@ public class Players {
         }
     }
 
-    public void readFile() throws IOException {
+    private void readFile() throws IOException {
         if(!Files.exists(playersPath)) {
             Files.createFile(playersPath);
             System.out.println("File Created!");
@@ -49,7 +49,7 @@ public class Players {
         }
     }
 
-    public void saveFile() throws IOException {
+    private void saveFile()  {
 
         List<String> lines = new ArrayList<String>();
         int count = 0;
@@ -57,10 +57,14 @@ public class Players {
             lines.add(count, player.toString());
             count++;
         }
-        Files.write(playersPath, lines, utf8);
+        try {
+            Files.write(playersPath, lines, utf8);
+        } catch (IOException e) {
+            System.out.println("Error writing to file: " + e.getMessage());
+        }
     }
 
-    public boolean addPlayer(String name, String disc, String summonerName) throws IOException {
+    public boolean addPlayer(String name, String disc, String summonerName) {
         if(!doesPlayerExist(name, disc)) {
             long summonerID = RiotAPI.getSummonerByName(summonerName).getID();
             registeredPlayers.add(new Player(name, disc, summonerID));
@@ -71,7 +75,18 @@ public class Players {
         }
     }
 
-    public boolean doesPlayerExist(String name, String disc) {
+    public boolean removePlayerByDiscordID(String name, String disc) {
+        for (Player player: registeredPlayers) {
+            if (player.getUsername().equals(name) && player.getDiscriminator().equals(disc)) {
+                registeredPlayers.remove(player);
+                saveFile();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean doesPlayerExist(String name, String disc) {
         String entryId = name + disc;
         for (Player player: registeredPlayers) {
             String playerId = player.getUsername() + player.getDiscriminator();
@@ -89,5 +104,14 @@ public class Players {
             }
         }
         return null;
+    }
+
+    public String viewPlayers() {
+        String lines = "```\nDiscordID, Summoner Name";
+        for (Player player: registeredPlayers) {
+            lines += "\n" + player.getUsername() + "#" + player.getDiscriminator() + ", " +RiotAPI.getSummonerName(player.getSummonerID());
+        }
+        lines += "\n```";
+        return lines;
     }
 }
