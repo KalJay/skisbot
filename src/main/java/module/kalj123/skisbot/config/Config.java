@@ -1,5 +1,6 @@
 package module.kalj123.skisbot.config;
 
+import ch.qos.logback.classic.spi.STEUtil;
 import sx.blah.discord.handle.impl.obj.Guild;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -24,65 +25,106 @@ public class Config {
 
     private final String config = "config.txt"; ///module/kalj123/skisbot/resources/
     private Path configPath = Paths.get(config);
-    Charset utf8 = StandardCharsets.UTF_8;
+    private Charset utf8 = StandardCharsets.UTF_8;
 
-    private List<IGuild> guildList;
-    private ArrayList<IChannel> botChannels;
+    private ArrayList<KGuild> guildList;
+    private List<String>configLines;
 
     public Config(List<IGuild> guilds) {
-        guildList = guilds;
-        botChannels = new ArrayList<IChannel>();
+        guildList = new ArrayList<KGuild>();
 
+        for (IGuild guild : guilds) {
+            guildList.add(new KGuild(guild, null));
+        }
 
         if(!Files.exists(configPath)) {
-            try {
-                createConfig(guildList);
-            } catch (Exception e){
-                System.out.println("Error creating config file!\n" + e.getMessage());
-            }
-        }
-        try {
-            readConfig(guildList);
-        } catch (Exception e) {
-            System.out.println("Error reading config file!\n");
-            e.printStackTrace();
+                createConfig(guilds);
         }
 
+        readConfig();
     }
 
-    private void readConfig(List<IGuild> guilds) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(config));
-        String line;
-        for (IGuild guild : guilds) {
-            line = br.readLine();
-            String[] lines = line.split(":");
-            if(("guild_" + guild.getStringID() + "_botchannel").equals(lines[0])) {
-                if (lines[0].equals("guild_" + guild.getStringID() + "_botchannel") && !lines[1].substring(1).equals("")) {
-                    botChannels.add(guild.getChannelByID(Long.parseLong(lines[1].substring(1))));
-                } else {
-                    botChannels.add(guild.getGeneralChannel());
+    private void readConfig() {
+        try {
+            configLines = Files.readAllLines(configPath, utf8);
+            for (String line : configLines) {
+                String[] lines = line.split(":");
+                for (KGuild kGuild : guildList) {
+                    if(("guild_" + kGuild.getGuild().getStringID() + "_botchannel").equals(lines[0])) {
+                        if (lines[0].equals("guild_" + kGuild.getGuild().getStringID() + "_botchannel") && !lines[1].substring(1).equals("")) {
+                            kGuild.setBotChannel(kGuild.getGuild().getChannelByID(Long.parseLong(lines[1].substring(1))));
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void writeConfig() {
+        try {
+            Files.write(configPath, configLines, utf8);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void createConfig(List<IGuild> guilds) {
+        System.out.println("Config file not found, creating...");
+        try {
+            Files.createFile(configPath);
+            System.out.println("Config file created!");
+            List<String> lines = new ArrayList<String>();
+            for (IGuild guild : guilds) {
+                lines.add("guild_" + guild.getStringID() + "_botchannel:-");
+                Files.write(configPath, lines, utf8);
+                System.out.println("Added entry for guild '" + guild.getName() + "', please add a botChannel ID to this for league interaction to work!");
+                guildList.add(new KGuild(guild, null));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public IChannel getGuildBotChannel(IGuild guild) {
+        for (KGuild kGuild : guildList) {
+            if(kGuild.getGuild() == guild ) {
+                if (kGuild.getBotChannel() == null) {
+                    return kGuild.getGuild().getGeneralChannel();
+                }
+                return kGuild.getBotChannel();
+            }
+        }
+        return null;
+    }
+
+    public String setGuildBotChannel(IGuild guild, String channelID) {
+        if (guild.getChannelByID(Long.parseLong(channelID)) != null) {
+            for (KGuild kGuild : guildList) {
+                if (kGuild.getGuild() == guild) {
+                    kGuild.setBotChannel(guild.getChannelByID(Long.parseLong(channelID)));
+                    writeBotChannel(guild, channelID);
+                    return "Set the Bot Channel for this Guild to " + kGuild.getBotChannel().getName();
                 }
             }
         }
+        return "Invalid ChannelID";
     }
 
-
-    private void createConfig(List<IGuild> guilds) throws IOException, URISyntaxException {
-        System.out.println("Config file not found, creating...");
-        Files.createFile(configPath);
-        System.out.println("Config file created!");
-        List<String> lines = new ArrayList<String>();
-        for (IGuild guild : guilds) {
-            lines.add("guild_" + guild.getStringID() + "_botchannel:-");
-            Files.write(configPath, lines, utf8);
-            System.out.println("Added botChannel entry for guild '" + guild.getName() + "', please add a botChannel ID to this for league interaction to work!");
+    private void writeBotChannel(IGuild guild, String channelID) {
+        int count = 0;
+        for (String line : configLines) {
+            String[] lines = line.split(":");
+            if (lines[0].equals("guild_" + guild.getStringID() + "_botchannel")) {
+                configLines.set(count, "guild_" + guild.getStringID() + "_botchannel:-" + channelID);
+            }
+            count++;
         }
-        botChannels.clear();
-    }
-    public IChannel getGuildBotChannel(IGuild guild) {
-        int index = guildList.indexOf(guild);
-        if(index == -1 || botChannels.size() < 1)
-            return guild.getGeneralChannel();
-        return botChannels.get(index);
+        try {
+            Files.write(configPath, configLines, utf8);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

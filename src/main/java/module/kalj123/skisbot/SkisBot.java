@@ -46,7 +46,7 @@ public class SkisBot {
     }
 
     private static IDiscordClient getClient() throws DiscordException {
-        return new ClientBuilder().withToken("MjA4OTAxMjEyMzE2MTA2NzUz.CoCNlg.X-FC-9PKvxBQcuzpXUWD2g3M1QU").login();
+        return new ClientBuilder().withToken("MjA4ODg5NzA5MzYxODg5Mjgx.CoEgxA.ZV1wxXT3ORQx6JcILResXg0WUlw").login();
     }
 
     //credit to oopsjpeg's tutorial at https://github.com/oopsjpeg/d4j-audioplayer

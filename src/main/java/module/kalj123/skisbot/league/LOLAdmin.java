@@ -38,6 +38,8 @@ public class LOLAdmin {
                 return players.viewPlayers();
             case "botchannel":
                 return botChannel(guild);
+            case "setbot":
+                return config.setGuildBotChannel(guild, args[3]);
             case "help":
                 return help(user);
             default:
@@ -64,6 +66,7 @@ public class LOLAdmin {
         helpString += "\n!lol admin unlink <discordID> - unlinks via Discord ID";
         helpString += "\n!lol admin viewplayers - shows linked Discord IDs with corresponding Summoner names";
         helpString += "\n!lol admin botchannel - reveals the channel configured to be to the bot channel";
+        helpString += "\n!lol admin setbot <channelID>- sets the bot channel to the channel ID";
         helpString += "\n```";
         privateDM.sendMessage(helpString);
         return "Sent admin help to user " + user.getName();
