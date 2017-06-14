@@ -10,6 +10,7 @@ import sx.blah.discord.util.audio.AudioPlayer;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * Created by kalj123 on 31/7/2016.
@@ -36,7 +37,7 @@ public class SkisBot {
         return "SKISBot";
     }
     public String getVersion() {
-        return "1.0";
+        return "1.1";
     }
 
     public static void main(String[] args) throws Exception {
@@ -45,15 +46,23 @@ public class SkisBot {
     }
 
     private static IDiscordClient getClient() throws DiscordException {
-        return new ClientBuilder().withToken("MjA4ODg5NzA5MzYxODg5Mjgx.CoEgxA.ZV1wxXT3ORQx6JcILResXg0WUlw").login();
+        return new ClientBuilder().withToken("MjA4OTAxMjEyMzE2MTA2NzUz.CoCNlg.X-FC-9PKvxBQcuzpXUWD2g3M1QU").login();
     }
 
     //credit to oopsjpeg's tutorial at https://github.com/oopsjpeg/d4j-audioplayer
     // Queue audio from specified file for guild
     public static void playAudioFromFile(String s_file, IGuild guild) throws IOException, UnsupportedAudioFileException {
-        File file = new File(s_file); // Get file
+        //File file = new File(s_file); // Get file
+        URL url;
+        if (SkisBot.class.getResource("SkisBot.class").toString().startsWith("file:")) {
+            url = new File("src/main/resources/resources/" + s_file).toURI().toURL();
+        } else {
+            //System.out.println(SkisBot.class.getResource("/resources/" + s_file).toString());
+            System.out.println("/resources/" + s_file);
+            url = SkisBot.class.getResource("/resources/" + s_file);
+        }
         AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(guild); // Get AudioPlayer for guild
-        player.queue(file); // Queue file
+        player.queue(url); // Queue file
     }
 }
 /*

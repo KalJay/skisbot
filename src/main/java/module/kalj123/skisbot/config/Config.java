@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -21,7 +22,7 @@ import java.util.List;
  */
 public class Config {
 
-    private final String config = "src/main/resources/config.txt";
+    private final String config = "config.txt"; ///module/kalj123/skisbot/resources/
     private Path configPath = Paths.get(config);
     Charset utf8 = StandardCharsets.UTF_8;
 
@@ -31,6 +32,7 @@ public class Config {
     public Config(List<IGuild> guilds) {
         guildList = guilds;
         botChannels = new ArrayList<IChannel>();
+
 
         if(!Files.exists(configPath)) {
             try {
@@ -42,7 +44,8 @@ public class Config {
         try {
             readConfig(guildList);
         } catch (Exception e) {
-            System.out.println("Error reading config file!\n" + e.getMessage());
+            System.out.println("Error reading config file!\n");
+            e.printStackTrace();
         }
 
     }
@@ -54,7 +57,7 @@ public class Config {
             line = br.readLine();
             String[] lines = line.split(":");
             if(("guild_" + guild.getStringID() + "_botchannel").equals(lines[0])) {
-                if (lines[0].equals("guild_" + guild.getStringID() + "_botchannel")) {
+                if (lines[0].equals("guild_" + guild.getStringID() + "_botchannel") && !lines[1].substring(1).equals("")) {
                     botChannels.add(guild.getChannelByID(Long.parseLong(lines[1].substring(1))));
                 } else {
                     botChannels.add(guild.getGeneralChannel());
@@ -64,7 +67,7 @@ public class Config {
     }
 
 
-    private void createConfig(List<IGuild> guilds) throws IOException {
+    private void createConfig(List<IGuild> guilds) throws IOException, URISyntaxException {
         System.out.println("Config file not found, creating...");
         Files.createFile(configPath);
         System.out.println("Config file created!");
@@ -78,7 +81,7 @@ public class Config {
     }
     public IChannel getGuildBotChannel(IGuild guild) {
         int index = guildList.indexOf(guild);
-        if(index == -1)
+        if(index == -1 || botChannels.size() < 1)
             return guild.getGeneralChannel();
         return botChannels.get(index);
     }

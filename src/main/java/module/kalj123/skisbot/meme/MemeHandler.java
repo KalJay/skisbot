@@ -1,10 +1,18 @@
 package module.kalj123.skisbot.meme;
 
 import module.kalj123.skisbot.SkisBot;
+import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.*;
+import sx.blah.discord.util.EmbedBuilder;
+import java.io.*;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Created by Kale on 13/06/2017.
@@ -25,56 +33,60 @@ public class MemeHandler {
 
         switch (event.getMessage().getContent()) {
             case "!skis":
-                playVoice(event, "src/main/resources/skis.wav");
+                playVoice(event, "skis.wav");
                 break;
             case "!skislongthisisalljusttodiscouragespamandtopreventoverusekthanksbailolrektming":
-                playVoice(event, "src/main/resources/skislong.wav");
+                playVoice(event, "skislong.wav");
                 break;
             case "!jesus":
-                playVoice(event, "src/main/resources/jesus.wav");
+                playVoice(event, "jesus.wav");
                 break;
             case "!shame":
-                playVoice(event, "src/main/resources/shame.mp3");
+                playVoice(event, "shame.wav");
                 break;
             case "!hiitline":
-                playVoice(event, "src/main/resources/hiitline.mp3");
+                playVoice(event, "hiitline.wav");
                 break;
             case "!god":
                 double number = Math.random();
                 if (number < 0.25) {
-                    playVoice(event, "src/main/resources/god1.wav");
+                    playVoice(event, "god1.wav");
                 } else if (number < 0.5) {
-                    playVoice(event, "src/main/resources/god2.wav");
+                    playVoice(event, "god2.wav");
                 } else if (number < 0.75) {
-                    playVoice(event, "src/main/resources/god3.wav");
+                    playVoice(event, "god3.wav");
                 } else {
-                    playVoice(event, "src/main/resources/god4.wav");
+                    playVoice(event, "god4.wav");
                 }
                 break;
 
             case "!timeforleague":
-                sendFile(event.getMessage(), "src/main/resources/timeforleague.jpg");
+                sendFileToChannel(event.getMessage().getChannel(), "timeforleague.jpg"); //src/main/resources/resources/
+                event.getMessage().delete();
                 break;
             case "!timeforskis":
-                sendFile(event.getMessage(), "src/main/resources/timeforskis.jpg");
+                sendFileToChannel(event.getMessage().getChannel(), "timeforskis.jpg");
+                event.getMessage().delete();
                 break;
             case "!slashingprices":
-                sendFile(event.getMessage(), "src/main/resources/slashingprices.png");
+                sendFileToChannel(event.getMessage().getChannel(), "slashingprices.png");
+                event.getMessage().delete();
                 break;
             case "!rosetta":
                 event.getMessage().getChannel().sendMessage("http://www.rosettastone.com");
-                String authName = event.getMessage().getAuthor().getName();
-                event.getMessage().getChannel().sendMessage("by " + authName);
                 event.getMessage().delete();
                 break;
             case "!backfromthedead":
-                sendFile(event.getMessage(), "src/main/resources/skisisback.jpg");
+                sendFileToChannel(event.getMessage().getChannel(), "skisisback.jpg");
+                event.getMessage().delete();
                 break;
             case "!truck":
-                sendFile(event.getMessage(), "src/main/resources/truck.jpg");
+                sendFileToChannel(event.getMessage().getChannel(), "truck.jpg");
+                event.getMessage().delete();
                 break;
             case "!lizstart":
                 event.getMessage().getChannel().sendMessage(randomLizConvoStarter());
+                event.getMessage().delete();
                 break;
             case "!help":
                 help(event.getMessage());
@@ -184,6 +196,36 @@ public class MemeHandler {
             }
             //Thread.sleep(delay);
             //channel.leave();
+        }
+    }
+
+    private void sendFileToChannel(IChannel channel, String file) {
+        try {
+            URL url;
+            if (MemeHandler.class.getResource("MemeHandler.class").toString().startsWith("file:")) {
+                url = new File("src/main/resources/resources/" + file).toURI().toURL();
+            } else {
+                System.out.println(MemeHandler.class.getResource("/resources/" + file).toString());
+                url = MemeHandler.class.getResource("/resources/" + file);
+            }
+            BufferedImage image = ImageIO.read(url);
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            ImageIO.write(image, decideFormat(file), os);
+            InputStream is = new ByteArrayInputStream(os.toByteArray());
+            channel.sendFile("", is, file);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String decideFormat(String name) {
+        if (name.contains(".")) {
+            System.out.print(name.substring(name.indexOf(".") + 1));
+            return name.substring(name.indexOf(".") + 1);
+        } else {
+            return "jpg";
         }
     }
 }

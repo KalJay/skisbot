@@ -29,7 +29,7 @@ public class EventHandler {
             System.out.println("Unable to create League Handler! Error message: " + e.getMessage());
         }
         meme = new MemeHandler();
-        System.out.print("Meme Handler Online!");
+        System.out.println("Meme Handler Online!");
     }
 
 

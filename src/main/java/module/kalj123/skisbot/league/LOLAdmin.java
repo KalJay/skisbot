@@ -47,7 +47,7 @@ public class LOLAdmin {
 
     private String unLink(String discordID) {
         String lines[] = discordID.split("#");
-        if (players.removePlayerByDiscordID(lines[0], lines[1] )) {
+        if (discordID.contains("#") && players.removePlayerByDiscordID(lines[0], lines[1] )) {
             return "Successfully unlinked " + discordID;
         } else {
             return "Unlink was unsuccessful";

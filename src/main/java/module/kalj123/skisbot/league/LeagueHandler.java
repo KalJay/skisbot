@@ -55,7 +55,7 @@ public class LeagueHandler {
             case "help":
                 help(event.getMessage().getAuthor());
                 break;
-            case "lolAdmin":
+            case "admin":
                 config.getGuildBotChannel(activeGuild).sendMessage(lolAdmin.handle(args, event.getAuthor(), event.getGuild()));
                 break;
             case "refresh":

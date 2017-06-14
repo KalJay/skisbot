@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class Players {
 
-    private final String players = "src/main/resources/players.txt";
+    private final String players = "players.txt"; //src/main/resources/
     private Path playersPath = Paths.get(players);
 
     private ArrayList<Player> registeredPlayers;
