@@ -46,7 +46,7 @@ public class SkisBot {
     }
 
     private static IDiscordClient getClient() throws DiscordException {
-        return new ClientBuilder().withToken("MjA4ODg5NzA5MzYxODg5Mjgx.CoEgxA.ZV1wxXT3ORQx6JcILResXg0WUlw").login();
+        return new ClientBuilder().withToken("penis").login(); //fuck you ronnie I should be studying not dealing with your shit
     }
 
     //credit to oopsjpeg's tutorial at https://github.com/oopsjpeg/d4j-audioplayer
@@ -66,13 +66,7 @@ public class SkisBot {
     }
 }
 /*
-SKIS BOT: MjA4OTAxMjEyMzE2MTA2NzUz.CoCNlg.X-FC-9PKvxBQcuzpXUWD2g3M1QU
-KaljTestBot: MjA4ODg5NzA5MzYxODg5Mjgx.CoEgxA.ZV1wxXT3ORQx6JcILResXg0WUlw
 Checklist for updating:
--   update !help
--   change version in .pom
--   change version in getVersion()
--   update version in getMinimumDiscord4JVersion() if necessary
--   use compile.bat
--   update discord4j-shaded if necessary
+-   update !help commands
+-   change versions in .pom
 */
