@@ -28,6 +28,7 @@ public class LeagueHandler {
     private Config config;
     private Players players;
     private LOLAdmin lolAdmin;
+    private Boolean keyset = false;
 
 
 
@@ -35,8 +36,7 @@ public class LeagueHandler {
 
         players = new Players();
 
-        RiotAPI.setRegion(Region.OCE);
-        RiotAPI.setAPIKey("RGAPI-ce2745b8-b516-4ce0-a49f-034dfab0155e");
+
     }
 
     public void handler(MessageReceivedEvent event) {
@@ -44,19 +44,27 @@ public class LeagueHandler {
         IGuild activeGuild = event.getGuild();
         switch(args[1]) {
             case "link":
-                if (players.addPlayer(event.getAuthor().getName(), event.getAuthor().getDiscriminator(), args[2])) {
-                    config.getGuildBotChannel(activeGuild).sendMessage("Successfully linked " + event.getAuthor().getName() + " to summoner name " + args[2]);
-                } else
-                    config.getGuildBotChannel(activeGuild).sendMessage("You have already registered a Summoner name");
+                if (!keyset) {
+                    config.getGuildBotChannel(activeGuild).sendMessage("Riot API Key is not set in config file!");
+                } else {
+                    if (players.addPlayer(event.getAuthor().getName(), event.getAuthor().getDiscriminator(), args[2])) {
+                        config.getGuildBotChannel(activeGuild).sendMessage("Successfully linked " + event.getAuthor().getName() + " to summoner name " + args[2]);
+                    } else
+                        config.getGuildBotChannel(activeGuild).sendMessage("You have already registered a Summoner name");
+                }
                 break;
             case "view":
-                config.getGuildBotChannel(activeGuild).sendMessage(viewGame(args[2]));
-                break;
+                if (!keyset) {
+                    config.getGuildBotChannel(activeGuild).sendMessage("Riot API Key is not set in config file!");
+                } else {
+                    config.getGuildBotChannel(activeGuild).sendMessage(viewGame(args[2]));
+                    break;
+                }
             case "help":
                 help(event.getMessage().getAuthor());
                 break;
             case "admin":
-                config.getGuildBotChannel(activeGuild).sendMessage(lolAdmin.handle(args, event.getAuthor(), event.getGuild()));
+                config.getGuildBotChannel(activeGuild).sendMessage(lolAdmin.handle(args, event.getAuthor(), event.getGuild(), keyset));
                 break;
             case "refresh":
                 config.getGuildBotChannel(activeGuild).sendMessage(refresh());
@@ -71,6 +79,15 @@ public class LeagueHandler {
     public void startConfig(List<IGuild> guilds) {
         config = new Config(guilds);
         lolAdmin = new LOLAdmin(players, config);
+        RiotAPI.setRegion(Region.OCE);
+        String key = config.getRiotAPIKey();
+        if (!key.equals("")) {
+            RiotAPI.setAPIKey(config.getRiotAPIKey());
+            keyset = true;
+        } else {
+            System.out.println("Riot API key not set! League interaction limited...");
+            keyset = false;
+        }
     }
 
     private String viewGame(String name) {

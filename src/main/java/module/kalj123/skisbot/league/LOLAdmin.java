@@ -27,7 +27,7 @@ public class LOLAdmin {
         return "Unrecognised LoL command";
     }
 
-    public String handle(String[] args, IUser user, IGuild guild) {
+    public String handle(String[] args, IUser user, IGuild guild, boolean keyset) {
         if (!permissions.isUserHighestRole(user, guild)) {
             return "You don't have permission to do this";
         }

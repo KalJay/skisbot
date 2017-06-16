@@ -77,10 +77,12 @@ public class Config {
             Files.createFile(configPath);
             System.out.println("Config file created!");
             List<String> lines = new ArrayList<String>();
+            lines.add("riot_api_key:-");
+            System.out.println("Please add a RIOT API key to config.txt for league interaction to function!");
             for (IGuild guild : guilds) {
                 lines.add("guild_" + guild.getStringID() + "_botchannel:-");
                 Files.write(configPath, lines, utf8);
-                System.out.println("Added entry for guild '" + guild.getName() + "', please add a botChannel ID to this for league interaction to work!");
+                System.out.println("Added entry for guild '" + guild.getName() + "', please add a botChannel ID to this guild, unless general channel is fine");
                 guildList.add(new KGuild(guild, null));
             }
         } catch (IOException e) {
@@ -121,10 +123,16 @@ public class Config {
             }
             count++;
         }
-        try {
-            Files.write(configPath, configLines, utf8);
-        } catch (IOException e) {
-            e.printStackTrace();
+        writeConfig();
+    }
+
+    public String getRiotAPIKey() {
+        for (String line : configLines) {
+            String[] lines = line.split(":") ;
+            if (lines[0].equals("riot_api_key") && !lines[1].substring(1).equals("")) {
+                return lines[1].substring(1);
+            }
         }
+        return "";
     }
 }
