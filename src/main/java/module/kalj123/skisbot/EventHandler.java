@@ -21,14 +21,14 @@ public class EventHandler {
     private LeagueHandler league;
     private MemeHandler meme;
 
-    EventHandler() {
+    public EventHandler() {
         try {
             league = new LeagueHandler();
             System.out.println("League Handler Online!");
         } catch (IOException e) {
             System.out.println("Unable to create League Handler! Error message: " + e.getMessage());
         }
-        meme = new MemeHandler();
+        meme = new MemeHandler(this);
         System.out.println("Meme Handler Online!");
     }
 
@@ -36,7 +36,7 @@ public class EventHandler {
     @EventSubscriber
     public void onReadyEvent(ReadyEvent event) {
         System.out.println("The bot is now ready");
-        meme.updateStatus();
+        meme.setStatus();
         league.startConfig(SkisBot.discordClient.getGuilds());
     }
 
@@ -48,18 +48,20 @@ public class EventHandler {
     @EventSubscriber
     public void onMessageEvent(MessageReceivedEvent event) {
 
-        if (event.getMessage().getContent().startsWith("!lol")) {
+        if (event.getMessage().getContent().startsWith("!lol ")) {
             league.handler(event);
-            event.getMessage().delete();
+            deleteMessage(event.getMessage());
         } else {
             meme.handler(event);
         }
 
     }
 
+    public void deleteMessage(IMessage message) {
+        if(!message.getChannel().isPrivate()) {
+            message.delete();
 
-
-
-
+        }
+    }
 }
 //

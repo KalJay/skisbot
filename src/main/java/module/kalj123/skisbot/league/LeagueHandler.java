@@ -6,6 +6,7 @@ import com.robrua.orianna.type.core.common.Side;
 import com.robrua.orianna.type.core.currentgame.CurrentGame;
 import com.robrua.orianna.type.core.currentgame.Participant;
 import com.robrua.orianna.type.core.summoner.Summoner;
+import module.kalj123.skisbot.EventHandler;
 import module.kalj123.skisbot.SkisBot;
 import module.kalj123.skisbot.config.Config;
 import module.kalj123.skisbot.config.Players;
@@ -33,7 +34,6 @@ public class LeagueHandler {
 
 
     public LeagueHandler() throws IOException {
-
         players = new Players();
 
 

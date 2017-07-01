@@ -11,7 +11,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: com.github.austinv11:Discord4J:2.8.1" level="project" />
+    <orderEntry type="library" name="Maven: com.github.austinv11:Discord4J:2.8.4" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.24" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.6" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.3" level="project" />
@@ -46,6 +46,24 @@
     <orderEntry type="library" name="Maven: com.koloboke:koloboke-api-jdk8:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:1.1.7" level="project" />
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:1.1.7" level="project" />
+    <orderEntry type="library" name="Maven: com.github.xaanit:D4J-OAuth:master-426c201abf-1" level="project" />
+    <orderEntry type="library" name="Maven: io.vertx:vertx-web:3.4.1" level="project" />
+    <orderEntry type="library" name="Maven: io.vertx:vertx-auth-common:3.4.1" level="project" />
+    <orderEntry type="library" name="Maven: io.vertx:vertx-core:3.4.1" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-common:4.1.8.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-buffer:4.1.8.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-transport:4.1.8.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-handler:4.1.8.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-codec:4.1.8.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-handler-proxy:4.1.8.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-codec-socks:4.1.8.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-codec-http:4.1.8.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-codec-http2:4.1.8.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-resolver:4.1.8.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-resolver-dns:4.1.8.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-codec-dns:4.1.8.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.vertx:vertx-auth-oauth2:3.4.1" level="project" />
+    <orderEntry type="library" name="Maven: io.vertx:vertx-jwt:3.4.1" level="project" />
     <orderEntry type="library" name="Maven: com.robrua:orianna:2.4.6" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.3.1" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final" level="project" />

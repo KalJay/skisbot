@@ -55,11 +55,12 @@ public class SkisBot {
             url = new File("src/main/resources/" + token).toURI().toURL();
         } else {
             //System.out.println(SkisBot.class.getResource("/resources/" + s_file).toString());
-            System.out.println("/" + token);
+            //System.out.println("/" + token);
             url = SkisBot.class.getResource("/" + token);
         }
-        List<String> tokenLines = new ArrayList<String>();
+        List<String> tokenLines;
         tokenLines = Files.readAllLines(tokenPath, utf8);
+        //System.out.println(tokenLines);
         return tokenLines.get(0).split(":")[1];
     }
 
@@ -75,10 +76,7 @@ public class SkisBot {
         }
     }
 
-    //credit to oopsjpeg's tutorial at https://github.com/oopsjpeg/d4j-audioplayer
-    // Queue audio from specified file for guild
     public static void playAudioFromFile(String s_file, IGuild guild) throws IOException, UnsupportedAudioFileException {
-        //File file = new File(s_file); // Get file
         URL url;
         if (SkisBot.class.getResource("SkisBot.class").toString().startsWith("file:")) {
             url = new File("src/main/resources/resources/" + s_file).toURI().toURL();
@@ -87,8 +85,8 @@ public class SkisBot {
             System.out.println("/resources/" + s_file);
             url = SkisBot.class.getResource("/resources/" + s_file);
         }
-        AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(guild); // Get AudioPlayer for guild
-        player.queue(url); // Queue file
+        AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(guild);
+        player.queue(url);
     }
 }
 /*

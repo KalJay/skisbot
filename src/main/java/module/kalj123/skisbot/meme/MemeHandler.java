@@ -1,13 +1,17 @@
 package module.kalj123.skisbot.meme;
 
+import module.kalj123.skisbot.EventHandler;
 import module.kalj123.skisbot.SkisBot;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.*;
 import sx.blah.discord.util.EmbedBuilder;
+
+import java.awt.*;
 import java.io.*;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -21,12 +25,16 @@ public class MemeHandler {
 
     private boolean busy;
     private IVoiceChannel channel;
+    private EventHandler eventHandler;
 
     public void onTrackFinishEvent() {
         busy = false;
         channel.leave();
     }
 
+    public MemeHandler(EventHandler eventHandler) {
+        this.eventHandler = eventHandler;
+    } 
     public void handler(MessageReceivedEvent event) {
 
         updateStatus();
@@ -62,31 +70,31 @@ public class MemeHandler {
 
             case "!timeforleague":
                 sendFileToChannel(event.getMessage().getChannel(), "timeforleague.jpg"); //src/main/resources/resources/
-                event.getMessage().delete();
+                eventHandler.deleteMessage(event.getMessage());
                 break;
             case "!timeforskis":
                 sendFileToChannel(event.getMessage().getChannel(), "timeforskis.jpg");
-                event.getMessage().delete();
+                eventHandler.deleteMessage(event.getMessage());
                 break;
             case "!slashingprices":
                 sendFileToChannel(event.getMessage().getChannel(), "slashingprices.png");
-                event.getMessage().delete();
+                eventHandler.deleteMessage(event.getMessage());
                 break;
             case "!rosetta":
                 event.getMessage().getChannel().sendMessage("http://www.rosettastone.com");
-                event.getMessage().delete();
+                eventHandler.deleteMessage(event.getMessage());
                 break;
             case "!backfromthedead":
                 sendFileToChannel(event.getMessage().getChannel(), "skisisback.jpg");
-                event.getMessage().delete();
+                eventHandler.deleteMessage(event.getMessage());
                 break;
             case "!truck":
                 sendFileToChannel(event.getMessage().getChannel(), "truck.jpg");
-                event.getMessage().delete();
+                eventHandler.deleteMessage(event.getMessage());
                 break;
             case "!lizstart":
                 event.getMessage().getChannel().sendMessage(randomLizConvoStarter());
-                event.getMessage().delete();
+                eventHandler.deleteMessage(event.getMessage());
                 break;
             case "!help":
                 help(event.getMessage());
@@ -97,15 +105,15 @@ public class MemeHandler {
                 if (event.getMessage().getContent().contains("kys")) {
                     event.getMessage().getChannel().sendMessage("Good Team");
                 }
-                if (event.getMessage().getContent().startsWith("!")) {
-                    event.getMessage().delete();
+                if (event.getMessage().getContent().startsWith("!") && event.getMessage().getContent().length() > 1) {
+                    eventHandler.deleteMessage(event.getMessage());
                 }
         }
     }
 
     private void help(IMessage message) {
         IPrivateChannel privateDM = SkisBot.discordClient.getOrCreatePMChannel(message.getAuthor());
-        message.delete();
+        eventHandler.deleteMessage(message);
         String helpString = "```";
         helpString += "\n!timeforleague - sends time for league picture with mention to @here";
         helpString += "\n!skis - skiskiski in voice channel you are currently connected to";
@@ -157,26 +165,39 @@ public class MemeHandler {
 
     private String randomStatus() {
         double number = java.lang.Math.random();
-        if(number < 0.34) {
+        if(number < 0.25) {
             //System.out.print("1, " + number);
             return "hiitline bling";
         } else {
-            if(number < 0.67) {
+            if(number < 0.5) {
                 //System.out.print("2, " + number);
                 return "IDM Youtube";
             } else {
-                //System.out.print("3, " + number);
-                return "flames";
+                if (number < 0.75) {
+                    //System.out.print("3, " + number);
+                    return "flames";
+                } else {
+                    //System.out.print("4, " + number);
+                    return "SKIS mixtape";
+                }
             }
         }
     }
 
     public void updateStatus() {
         double checknumber = Math.random();
-        // event.getMessage().getChannel().sendMessage("the number is " + checknumber);
+        //System.out.println("CheckNumber: " + checknumber);
         if (checknumber <= 0.10) {
-            SkisBot.discordClient.streaming(randomStatus(), "");
+            String status = randomStatus();
+            SkisBot.discordClient.changePlayingText(status);
+            //System.out.println("Text: " + status);
         }
+    }
+
+    public void setStatus() {
+        String status = randomStatus();
+        SkisBot.discordClient.changePlayingText(status);
+        System.out.println("Text: " + status);
     }
 
     private void playVoice(MessageReceivedEvent event, String file) {
@@ -184,18 +205,27 @@ public class MemeHandler {
             busy = true;
             IUser theAuthor = event.getMessage().getAuthor();
             IGuild theGuild = event.getMessage().getGuild();
-            channel = theAuthor.getVoiceStateForGuild(theGuild).getChannel();
-            channel.join();
-            event.getMessage().delete();
-            //Thread.sleep(1000);
-            try {
-                SkisBot.playAudioFromFile(file, theGuild);
-            } catch (Exception e) {
-                System.out.println("Error playing audio: " + e.getMessage());
-                channel.leave();
-            }
-            //Thread.sleep(delay);
-            //channel.leave();
+            if (!event.getChannel().isPrivate()) {
+                if (theAuthor.getVoiceStateForGuild(theGuild).getChannel() != null) {
+                    channel = theAuthor.getVoiceStateForGuild(theGuild).getChannel();
+                    //System.out.println("Found the voice channel: " + channel.getName());
+                    channel.join();
+                    //System.out.println("Joined the voice channel");
+                    eventHandler.deleteMessage(event.getMessage());
+                    try {
+                        SkisBot.playAudioFromFile(file, theGuild);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        channel.leave();
+                        busy = false;
+                    } catch (UnsupportedAudioFileException e) {
+                        e.printStackTrace();
+                        channel.leave();
+                        busy = false;
+                    }
+                } else {event.getChannel().sendMessage("You're not in a voice channel");}
+            } else {event.getChannel().sendMessage("Cannot play sound in a PM");}
+
         }
     }
 
@@ -222,7 +252,7 @@ public class MemeHandler {
 
     private String decideFormat(String name) {
         if (name.contains(".")) {
-            System.out.print(name.substring(name.indexOf(".") + 1));
+            //System.out.print(name.substring(name.indexOf(".") + 1));
             return name.substring(name.indexOf(".") + 1);
         } else {
             return "jpg";
