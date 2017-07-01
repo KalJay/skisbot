@@ -4,20 +4,20 @@ import module.kalj123.skisbot.Permissions;
 import module.kalj123.skisbot.SkisBot;
 import module.kalj123.skisbot.config.Config;
 import module.kalj123.skisbot.config.Players;
-import module.kalj123.skisbot.league.Player;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IPrivateChannel;
 import sx.blah.discord.handle.obj.IUser;
 
 /**
- * Created by Kale on 13/06/2017.
+ * Project: skisbot
+ * Created by Kale on 13/06/2017 at 3:01 AM.
  */
-public class LOLAdmin {
+class LOLAdmin {
     private Permissions permissions;
     private Players players;
     private Config config;
 
-    public LOLAdmin(Players players, Config config) {
+    LOLAdmin(Players players, Config config) {
         permissions = new Permissions();
         this.players = players;
         this.config = config;
@@ -27,7 +27,7 @@ public class LOLAdmin {
         return "Unrecognised LoL command";
     }
 
-    public String handle(String[] args, IUser user, IGuild guild, boolean keyset) {
+    String handle(String[] args, IUser user, IGuild guild) {
         if (!permissions.isUserHighestRole(user, guild)) {
             return "You don't have permission to do this";
         }

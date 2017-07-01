@@ -7,15 +7,13 @@ import sx.blah.discord.handle.obj.IUser;
 import java.util.List;
 
 /**
- * Created by Kale on 13/06/2017.
+ * Project: skisbot
+ * Created by Kale on 13/06/2017 at 3:07 AM.
  */
 public class Permissions {
 
-    private List<IRole> roles;
-    private List<IUser> users;
-
     private IRole getHighestRole(IGuild guild) {
-        setRolesAndUsers(guild);
+        List<IUser> users = guild.getUsers();
         IRole highestRole = users.get(0).getRolesForGuild(guild).get(0);
         for (IUser user: users) {
             for (IRole role: user.getRolesForGuild(guild)) {
@@ -39,10 +37,5 @@ public class Permissions {
             }
         }
         return false;
-    }
-
-    private void setRolesAndUsers(IGuild guild) {
-        roles = guild.getRoles();
-        users = guild.getUsers();
     }
 }

@@ -1,7 +1,8 @@
 package module.kalj123.skisbot.league;
 
 /**
- * Created by Kale on 2/06/2017.
+ * Project: skisbot
+ * Created by Kale on 2/06/2017 at 3:04 AM.
  */
 public class Player {
 

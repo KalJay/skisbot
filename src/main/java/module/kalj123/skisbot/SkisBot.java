@@ -2,7 +2,6 @@ package module.kalj123.skisbot;
 
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
-import sx.blah.discord.api.events.EventDispatcher;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.audio.AudioPlayer;
@@ -10,7 +9,6 @@ import sx.blah.discord.util.audio.AudioPlayer;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -21,20 +19,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by kalj123 on 31/7/2016.
+ * Project: skisbot
+ * Created by kalj123 on 31/7/2016 at 2:54 AM.
  */
 public class SkisBot {
     public static IDiscordClient discordClient;
     private static String token = "token.txt";
     private static Path tokenPath = Paths.get(token);
     private static Charset utf8 = StandardCharsets.UTF_8;
-
-    public boolean enable(IDiscordClient dclient) {
-        discordClient = dclient;
-        EventDispatcher dispatcher = discordClient.getDispatcher();
-        dispatcher.registerListener(new EventHandler());
-        return true;
-    }
 
     public static void main(String[] args) throws Exception {
         if (Files.exists(tokenPath)) {
@@ -50,14 +42,6 @@ public class SkisBot {
     }
 
     private static String retrieveToken() throws IOException {
-        URL url;
-        if (SkisBot.class.getResource("SkisBot.class").toString().startsWith("file:")) {
-            url = new File("src/main/resources/" + token).toURI().toURL();
-        } else {
-            //System.out.println(SkisBot.class.getResource("/resources/" + s_file).toString());
-            //System.out.println("/" + token);
-            url = SkisBot.class.getResource("/" + token);
-        }
         List<String> tokenLines;
         tokenLines = Files.readAllLines(tokenPath, utf8);
         //System.out.println(tokenLines);
@@ -67,7 +51,7 @@ public class SkisBot {
     private static void createTokenFile() {
         try {
             Files.createFile(tokenPath);
-            List<String> tokenLines = new ArrayList<String>();
+            List<String> tokenLines = new ArrayList<>();
             tokenLines.add("bot_token:");
             Files.write(tokenPath, tokenLines, utf8);
             System.out.println("Created Token File, please add the token to the file!");

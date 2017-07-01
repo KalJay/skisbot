@@ -4,27 +4,28 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 
 /**
- * Created by Kale on 15/06/2017.
+ * Project: skisbot
+ * Created by Kale on 15/06/2017 at 3:03 AM.
  */
-public class KGuild {
+class KGuild {
 
     private IGuild guild;
     private IChannel botChannel;
 
-    public KGuild(IGuild guild, IChannel botChannel) {
+    KGuild(IGuild guild, IChannel botChannel) {
         this.guild = guild;
         this.botChannel = botChannel;
     }
 
-    public IGuild getGuild() {
+    IGuild getGuild() {
         return guild;
     }
 
-    public IChannel getBotChannel() {
+    IChannel getBotChannel() {
         return botChannel;
     }
 
-    public void setBotChannel(IChannel channel) {
+    void setBotChannel(IChannel channel) {
         botChannel = channel;
     }
 }

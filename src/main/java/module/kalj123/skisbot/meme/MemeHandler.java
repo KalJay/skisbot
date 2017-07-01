@@ -2,12 +2,9 @@ package module.kalj123.skisbot.meme;
 
 import module.kalj123.skisbot.EventHandler;
 import module.kalj123.skisbot.SkisBot;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.*;
-import sx.blah.discord.util.EmbedBuilder;
 
-import java.awt.*;
 import java.io.*;
 
 import javax.imageio.ImageIO;
@@ -15,11 +12,11 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Created by Kale on 13/06/2017.
+ * Project: skisbot
+ * Created by Kale on 13/06/2017 at 2:58 AM.
  */
 public class MemeHandler {
 
@@ -131,17 +128,6 @@ public class MemeHandler {
         privateDM.sendMessage(helpString);
     }
 
-    private void sendFile(IMessage message, String pathname) {
-        try {
-            message.getChannel().sendFile(new File(pathname));
-        } catch (Exception e) {
-            System.out.println("Error sending file: " + e.getMessage());
-        }
-        String authName = message.getAuthor().getName();
-        message.getChannel().sendMessage("@here by " + authName);
-        message.delete();
-    }
-
     private String randomLizConvoStarter() {
         double number = java.lang.Math.random();
         if (number > 0.8) {
@@ -184,7 +170,7 @@ public class MemeHandler {
         }
     }
 
-    public void updateStatus() {
+    private void updateStatus() {
         double checknumber = Math.random();
         //System.out.println("CheckNumber: " + checknumber);
         if (checknumber <= 0.10) {
@@ -214,11 +200,7 @@ public class MemeHandler {
                     eventHandler.deleteMessage(event.getMessage());
                     try {
                         SkisBot.playAudioFromFile(file, theGuild);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        channel.leave();
-                        busy = false;
-                    } catch (UnsupportedAudioFileException e) {
+                    } catch (IOException | UnsupportedAudioFileException e) {
                         e.printStackTrace();
                         channel.leave();
                         busy = false;
@@ -243,8 +225,6 @@ public class MemeHandler {
             ImageIO.write(image, decideFormat(file), os);
             InputStream is = new ByteArrayInputStream(os.toByteArray());
             channel.sendFile("", is, file);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

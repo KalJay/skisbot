@@ -6,7 +6,6 @@ import com.robrua.orianna.type.core.common.Side;
 import com.robrua.orianna.type.core.currentgame.CurrentGame;
 import com.robrua.orianna.type.core.currentgame.Participant;
 import com.robrua.orianna.type.core.summoner.Summoner;
-import module.kalj123.skisbot.EventHandler;
 import module.kalj123.skisbot.SkisBot;
 import module.kalj123.skisbot.config.Config;
 import module.kalj123.skisbot.config.Players;
@@ -16,11 +15,11 @@ import sx.blah.discord.handle.obj.IPrivateChannel;
 import sx.blah.discord.handle.obj.IUser;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Kale on 2/06/2017.
+ * Project: skisbot
+ * Created by Kale on 2/06/2017 at 2:59 AM.
  */
 public class LeagueHandler {
 
@@ -64,7 +63,7 @@ public class LeagueHandler {
                 help(event.getMessage().getAuthor());
                 break;
             case "admin":
-                config.getGuildBotChannel(activeGuild).sendMessage(lolAdmin.handle(args, event.getAuthor(), event.getGuild(), keyset));
+                config.getGuildBotChannel(activeGuild).sendMessage(lolAdmin.handle(args, event.getAuthor(), event.getGuild()));
                 break;
             case "refresh":
                 config.getGuildBotChannel(activeGuild).sendMessage(refresh());
@@ -91,10 +90,10 @@ public class LeagueHandler {
     }
 
     private String viewGame(String name) {
-        Summoner focusPlayer = null;
+        Summoner focusPlayer;
         CurrentGame currentGame;
         String returnString;
-        List<Participant> participants = new ArrayList<Participant>();
+        List<Participant> participants;
 
         if ((focusPlayer = players.getSummonerFromName(name))== null) {
             return "Invalid summoner name";
@@ -118,7 +117,7 @@ public class LeagueHandler {
             }
         }
 
-        return returnString = returnString.concat("\n```");
+        return returnString.concat("\n```");
     }
 
     private void help(IUser user) {

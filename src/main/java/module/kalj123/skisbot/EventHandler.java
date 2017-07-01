@@ -6,22 +6,21 @@ import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.obj.*;
-import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.MissingPermissionsException;
-import sx.blah.discord.util.RateLimitException;
 import sx.blah.discord.util.audio.events.TrackFinishEvent;
 
-import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.File;
 import java.io.IOException;
 
+/**
+ * Project: skisbot
+ * Created by kalj123 on 31/7/2016 at 2:54 AM.
+ */
 public class EventHandler {
 
 
     private LeagueHandler league;
     private MemeHandler meme;
 
-    public EventHandler() {
+    EventHandler() {
         try {
             league = new LeagueHandler();
             System.out.println("League Handler Online!");

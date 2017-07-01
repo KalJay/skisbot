@@ -16,7 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Kale on 13/06/2017.
+ * Project: skisbot
+ * Created by Kale on 13/06/2017 at 3:03 AM.
  */
 public class Players {
 
@@ -27,7 +28,7 @@ public class Players {
     private Charset utf8 = StandardCharsets.UTF_8;
 
     public Players() {
-        registeredPlayers = new ArrayList<Player>();
+        registeredPlayers = new ArrayList<>();
         try {
             readFile();
         } catch (IOException e) {
@@ -42,7 +43,7 @@ public class Players {
         }
 
         BufferedReader br = new BufferedReader(new FileReader(players));
-        String line = null;
+        String line;
         while ((line = br.readLine()) != null) {
             String[] lines = line.split(",");
             registeredPlayers.add(new Player(lines[0], lines[1], Long.parseLong(lines[2])));
@@ -51,7 +52,7 @@ public class Players {
 
     private void saveFile()  {
 
-        List<String> lines = new ArrayList<String>();
+        List<String> lines = new ArrayList<>();
         int count = 0;
         for (Player player : registeredPlayers) {
             lines.add(count, player.toString());
@@ -107,11 +108,11 @@ public class Players {
     }
 
     public String viewPlayers() {
-        String lines = "```\nDiscordID, Summoner Name";
+        StringBuilder lines = new StringBuilder("```\nDiscordID, Summoner Name");
         for (Player player: registeredPlayers) {
-            lines += "\n" + player.getUsername() + "#" + player.getDiscriminator() + ", " +RiotAPI.getSummonerName(player.getSummonerID());
+            lines.append("\n").append(player.getUsername()).append("#").append(player.getDiscriminator()).append(", ").append(RiotAPI.getSummonerName(player.getSummonerID()));
         }
-        lines += "\n```";
-        return lines;
+        lines.append("\n```");
+        return lines.toString();
     }
 }

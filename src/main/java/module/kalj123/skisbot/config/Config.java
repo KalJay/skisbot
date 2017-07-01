@@ -1,15 +1,9 @@
 package module.kalj123.skisbot.config;
 
-import ch.qos.logback.classic.spi.STEUtil;
-import sx.blah.discord.handle.impl.obj.Guild;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -19,7 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Kale on 12/06/2017.
+ * Project: skisbot
+ * Created by Kale on 12/06/2017 at 3:01 AM.
  */
 public class Config {
 
@@ -31,7 +26,7 @@ public class Config {
     private List<String>configLines;
 
     public Config(List<IGuild> guilds) {
-        guildList = new ArrayList<KGuild>();
+        guildList = new ArrayList<>();
 
         for (IGuild guild : guilds) {
             guildList.add(new KGuild(guild, null));
@@ -76,7 +71,7 @@ public class Config {
         try {
             Files.createFile(configPath);
             System.out.println("Config file created!");
-            List<String> lines = new ArrayList<String>();
+            List<String> lines = new ArrayList<>();
             lines.add("riot_api_key:-");
             System.out.println("Please add a RIOT API key to config.txt for league interaction to function!");
             for (IGuild guild : guilds) {
