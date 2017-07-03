@@ -7,7 +7,6 @@ import com.github.xaanit.d4j.oauth.handle.IOAuthUser;
 import com.github.xaanit.d4j.oauth.util.DiscordOAuthBuilder;
 import io.vertx.core.http.HttpServerOptions;
 import module.kalj123.skisbot.SkisBot;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 
 import java.io.IOException;
@@ -33,8 +32,6 @@ public class OAuth {
     private static String clientID;
     private static String clientSecret;
 
-    public boolean active = true;
-
     public OAuth() {
         if (Files.exists(oauthPath)) {
             readOAuthFile();
@@ -57,7 +54,6 @@ public class OAuth {
             clientSecret = oauthLines.get(1).split(":")[1];
         } catch (IOException e) {
             e.printStackTrace();
-            active = false;
         }
     }
 
@@ -72,7 +68,6 @@ public class OAuth {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        active = false;
     }
 
     public static IOAuthUser getOAuthUser(IUser user) {

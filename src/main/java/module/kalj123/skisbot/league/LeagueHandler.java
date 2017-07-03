@@ -1,6 +1,5 @@
 package module.kalj123.skisbot.league;
 
-import com.github.xaanit.d4j.oauth.handle.IConnection;
 import com.robrua.orianna.api.core.RiotAPI;
 import com.robrua.orianna.type.core.common.Region;
 import com.robrua.orianna.type.core.common.Side;

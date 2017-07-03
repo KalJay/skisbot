@@ -20,7 +20,6 @@ public class EventHandler {
 
     private LeagueHandler league;
     private MemeHandler meme;
-    private OAuth oAuth;
 
     EventHandler() {
         try {
@@ -40,7 +39,7 @@ public class EventHandler {
         System.out.println("The bot is now ready");
         meme.setStatus();
         league.startConfig(SkisBot.discordClient.getGuilds());
-        oAuth = new OAuth();
+        new OAuth();
     }
 
     @EventSubscriber

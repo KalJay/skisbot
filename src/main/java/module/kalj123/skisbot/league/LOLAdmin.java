@@ -40,12 +40,23 @@ class LOLAdmin {
                 return botChannel(guild);
             case "setbot":
                 return config.setGuildBotChannel(guild, args[3]);
+            case "link":
+                return addPlayer(args[3], args[4]);
             case "help":
                 return help(user);
             default:
                 return unrecognised();
         }
 
+    }
+
+    private String addPlayer(String discordID, String summonerName) {
+        String lines[] = discordID.split("#");
+        if (discordID.contains("#") && players.addPlayer(lines[0], lines[1], summonerName)) {
+            return "Successfully linked " + discordID;
+        } else {
+            return "Link was unsuccessful";
+        }
     }
 
 
@@ -66,6 +77,7 @@ class LOLAdmin {
         IPrivateChannel privateDM = SkisBot.discordClient.getOrCreatePMChannel(user);
         String helpString = "```";
         helpString += "\n!lol admin unlink <discordID> - unlinks via Discord ID";
+        helpString += "\n!lol admin link <discordID> <summonerName> - links via Discord ID and Summoner name";
         helpString += "\n!lol admin viewplayers - shows linked Discord IDs with corresponding Summoner names";
         helpString += "\n!lol admin botchannel - reveals the channel configured to be to the bot channel";
         helpString += "\n!lol admin setbot <channelID>- sets the bot channel to the channel ID";
