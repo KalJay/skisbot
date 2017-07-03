@@ -1,7 +1,10 @@
 package module.kalj123.skisbot;
 
+import com.github.xaanit.d4j.oauth.util.DiscordOAuthBuilder;
 import module.kalj123.skisbot.league.LeagueHandler;
 import module.kalj123.skisbot.meme.MemeHandler;
+import module.kalj123.skisbot.oauth.OAuth;
+import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
@@ -19,6 +22,7 @@ public class EventHandler {
 
     private LeagueHandler league;
     private MemeHandler meme;
+    private OAuth oAuth;
 
     EventHandler() {
         try {
@@ -29,6 +33,7 @@ public class EventHandler {
         }
         meme = new MemeHandler(this);
         System.out.println("Meme Handler Online!");
+        oAuth = new OAuth();
     }
 
 
@@ -37,6 +42,7 @@ public class EventHandler {
         System.out.println("The bot is now ready");
         meme.setStatus();
         league.startConfig(SkisBot.discordClient.getGuilds());
+        oAuth.postAuthLink();
     }
 
     @EventSubscriber

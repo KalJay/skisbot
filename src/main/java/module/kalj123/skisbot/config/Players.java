@@ -87,7 +87,7 @@ public class Players {
         return false;
     }
 
-    private boolean doesPlayerExist(String name, String disc) {
+    public boolean doesPlayerExist(String name, String disc) {
         String entryId = name + disc;
         for (Player player: registeredPlayers) {
             String playerId = player.getUsername() + player.getDiscriminator();

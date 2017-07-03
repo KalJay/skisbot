@@ -45,7 +45,9 @@ class LOLAdmin {
             default:
                 return unrecognised();
         }
+
     }
+
 
     private String unLink(String discordID) {
         String lines[] = discordID.split("#");
