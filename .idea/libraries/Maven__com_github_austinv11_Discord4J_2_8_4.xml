@@ -9,6 +9,7 @@
     <SOURCES>
       <root url="jar://$MAVEN_REPOSITORY$/com/github/austinv11/Discord4j/2.8.4/Discord4J-2.8.4-sources.jar!/" />
       <root url="jar://$MAVEN_REPOSITORY$/com/github/austinv11/Discord4j/2.8.4/Discord4J-2.8.4-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/austinv11/Discord4j/2.8.4/Discord4J-2.8.4-sources.jar!/" />
     </SOURCES>
   </library>
 </component>
