@@ -10,6 +10,7 @@ import com.robrua.orianna.type.core.summoner.Summoner;
 import module.kalj123.skisbot.SkisBot;
 import module.kalj123.skisbot.config.Config;
 import module.kalj123.skisbot.config.Players;
+import module.kalj123.skisbot.oauth.OAuth;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IPrivateChannel;
@@ -47,10 +48,11 @@ public class LeagueHandler {
                 if (!keyset) {
                     config.getGuildBotChannel(activeGuild).sendMessage("Riot API Key is not set in config file!");
                 } else {
-                    if (players.addPlayer(event.getAuthor().getName(), event.getAuthor().getDiscriminator(), args[2])) {
-                        config.getGuildBotChannel(activeGuild).sendMessage("Successfully linked " + event.getAuthor().getName() + " to summoner name " + args[2]);
+
+                    if (!players.doesPlayerExist(event.getAuthor().getName(), event.getAuthor().getDiscriminator())) {
+                        config.getGuildBotChannel(activeGuild).sendMessage(players.addPlayerWithCheck(event.getAuthor()));
                     } else
-                        config.getGuildBotChannel(activeGuild).sendMessage("You have already registered a Summoner name");
+                        config.getGuildBotChannel(activeGuild).sendMessage("You have already registered!");
                 }
                 break;
             case "view":
@@ -69,11 +71,19 @@ public class LeagueHandler {
             case "refresh":
                 config.getGuildBotChannel(activeGuild).sendMessage(refresh());
                 break;
+            case "auth":
+                sendAuthLinkToUser(event.getAuthor());
+                break;
             default:
                 config.getGuildBotChannel(activeGuild).sendMessage(unrecognised());
                 break;
         }
 
+    }
+
+    private void sendAuthLinkToUser(IUser user) {
+        IPrivateChannel privateDM = SkisBot.discordClient.getOrCreatePMChannel(user);
+        privateDM.sendMessage("<"+ OAuth.getAuthLink() + ">");
     }
 
     public void startConfig(List<IGuild> guilds) {
@@ -88,7 +98,6 @@ public class LeagueHandler {
             System.out.println("Riot API key not set! League interaction limited...");
             keyset = false;
         }
-
     }
 
     private String viewGame(String name) {
@@ -125,8 +134,9 @@ public class LeagueHandler {
     private void help(IUser user) {
         IPrivateChannel privateDM = SkisBot.discordClient.getOrCreatePMChannel(user);
         String helpString = "```";
-        helpString += "\n!lol link <summonerName> - links your discord account with the provided summoner name";
+        helpString += "\n!lol link - links your discord account with your League of Legends Discord integration";
         helpString += "\n!lol view <summonerName> - provides a short description of the player's current game";
+        helpString += "\n!lol auth - privately sends an authorization link for this bot";
         helpString += "\n```";
         privateDM.sendMessage(helpString);
     }

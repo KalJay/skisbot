@@ -7,7 +7,6 @@ import com.github.xaanit.d4j.oauth.handle.IOAuthUser;
 import com.github.xaanit.d4j.oauth.util.DiscordOAuthBuilder;
 import io.vertx.core.http.HttpServerOptions;
 import module.kalj123.skisbot.SkisBot;
-import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 
@@ -42,7 +41,7 @@ public class OAuth {
             iDiscordOAuth = new DiscordOAuthBuilder(SkisBot.discordClient)
                     .withClientID(clientID)
                     .withClientSecret(clientSecret)
-                    .withRedirectUrl("http://101.164.144.156:8787/callback")
+                    .withRedirectUrl("http://101.164.144.156:" + getPortNumber() +"/callback")
                     .withHttpServerOptions(new HttpServerOptions().setPort(8787))
                     .withScopes(Scope.IDENTIFY, Scope.CONNECTIONS)
                     .build();
@@ -76,25 +75,26 @@ public class OAuth {
         active = false;
     }
 
-    public IOAuthUser getOAuthUser(IUser user) {
+    public static IOAuthUser getOAuthUser(IUser user) {
         return iDiscordOAuth.getOAuthUser(user);
     }
 
-    public boolean isLeagueUser(IUser user) {
-        if (iDiscordOAuth.getOAuthUser(user) == null) {
-            return false;
-        }
-        for (IConnection connection : iDiscordOAuth.getOAuthUser(user).getConnections()) {
-            if (connection.getName().equals("League of Legends")) {
-                return true;
-            }
-        }
-        return false;
+    public static String getAuthLink() {
+        return iDiscordOAuth.buildAuthUrl();
     }
 
-    public void postAuthLink() {
-        for(IGuild guild : SkisBot.discordClient.getGuilds()) {
-            guild.getGeneralChannel().sendMessage("Authorise me! <" + iDiscordOAuth.buildAuthUrl() + ">");
+    private static String getPortNumber() {
+        if(SkisBot.discordClient.getOurUser().getName().equals("KaljTestBot")) {
+            return "8787";
+        } else {return "8788";}
+    }
+
+    public static IConnection getLeagueConnection(IUser user) {
+        for(IConnection connection : getOAuthUser(user).getConnections()) {
+            if (connection.getType().equals("leagueoflegends")) {
+                return connection;
+            }
         }
+        return null;
     }
 }

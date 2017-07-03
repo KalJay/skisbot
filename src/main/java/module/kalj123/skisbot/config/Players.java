@@ -1,8 +1,11 @@
 package module.kalj123.skisbot.config;
 
+import com.github.xaanit.d4j.oauth.handle.IConnection;
 import com.robrua.orianna.api.core.RiotAPI;
 import com.robrua.orianna.type.core.summoner.Summoner;
 import module.kalj123.skisbot.league.Player;
+import module.kalj123.skisbot.oauth.OAuth;
+import sx.blah.discord.handle.obj.IUser;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -34,6 +37,19 @@ public class Players {
         } catch (IOException e) {
             e.getMessage();
         }
+    }
+
+    public String addPlayerWithCheck(IUser user) {
+        if(OAuth.getOAuthUser(user) == null) {
+            return "You have not authorised this bot!";
+        }
+//        for (IConnection connection : OAuth.getOAuthUser(user).getConnections())
+        IConnection connection = OAuth.getLeagueConnection(user);
+        if(connection != null) {
+            addPlayer(user.getName(), user.getDiscriminator(), connection.getName());
+            return "Successfully linked " + connection.getName() + " to " + user.getName();
+        }
+        return "You have not connected League of Legends with Discord!";
     }
 
     private void readFile() throws IOException {
