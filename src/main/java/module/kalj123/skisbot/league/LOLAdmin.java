@@ -4,6 +4,7 @@ import module.kalj123.skisbot.Permissions;
 import module.kalj123.skisbot.SkisBot;
 import module.kalj123.skisbot.config.Config;
 import module.kalj123.skisbot.config.Players;
+import module.kalj123.skisbot.database.SQLitePlayers;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IPrivateChannel;
 import sx.blah.discord.handle.obj.IUser;
@@ -33,15 +34,15 @@ class LOLAdmin {
         }
         switch(args[2]) {
             case "unlink":
-                return unLink(args[3]);
+                return unLink(args[3], guild);
             case "viewplayers":
-                return players.viewPlayers();
+                return players.viewPlayers(guild);
             case "botchannel":
                 return botChannel(guild);
             case "setbot":
                 return config.setGuildBotChannel(guild, args[3]);
             case "link":
-                return addPlayer(args[3], args[4]);
+                return linkPlayer(guild, args[3], args[4]);
             case "help":
                 return help(user);
             default:
@@ -50,23 +51,14 @@ class LOLAdmin {
 
     }
 
-    private String addPlayer(String discordID, String summonerName) {
-        String lines[] = discordID.split("#");
-        if (discordID.contains("#") && players.addPlayer(lines[0], lines[1], summonerName)) {
-            return "Successfully linked " + discordID;
-        } else {
-            return "Link was unsuccessful";
-        }
+    private String linkPlayer(IGuild guild, String ID, String summonerID) {
+        SQLitePlayers.addSummonerIDToPlayer(guild.getUserByID(Long.parseLong(ID)), guild, summonerID);
+        return "Successfully linked player";
     }
 
-
-    private String unLink(String discordID) {
-        String lines[] = discordID.split("#");
-        if (discordID.contains("#") && players.removePlayerByDiscordID(lines[0], lines[1] )) {
-            return "Successfully unlinked " + discordID;
-        } else {
-            return "Unlink was unsuccessful";
-        }
+    private String unLink(String discordID, IGuild guild) {
+        SQLitePlayers.deleteSummonerIDFromPlayer(guild.getUserByID(Long.parseLong(discordID)), guild);
+        return "Successfully unlinked player";
     }
 
     private String botChannel(IGuild guild) {

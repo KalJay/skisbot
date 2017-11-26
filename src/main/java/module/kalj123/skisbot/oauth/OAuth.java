@@ -5,8 +5,15 @@ import com.github.xaanit.d4j.oauth.handle.IConnection;
 import com.github.xaanit.d4j.oauth.handle.IDiscordOAuth;
 import com.github.xaanit.d4j.oauth.handle.IOAuthUser;
 import com.github.xaanit.d4j.oauth.util.DiscordOAuthBuilder;
+import com.robrua.orianna.api.core.RiotAPI;
 import io.vertx.core.http.HttpServerOptions;
 import module.kalj123.skisbot.SkisBot;
+import module.kalj123.skisbot.config.Players;
+import module.kalj123.skisbot.database.SQLitePlayers;
+import module.kalj123.skisbot.league.LeagueHandler;
+import net.rithms.riot.api.RiotApiException;
+import net.rithms.riot.constant.Platform;
+import sx.blah.discord.handle.impl.events.module.ModuleEvent;
 import sx.blah.discord.handle.obj.IUser;
 
 import java.io.IOException;
@@ -39,7 +46,7 @@ public class OAuth {
                     .withClientID(clientID)
                     .withClientSecret(clientSecret)
                     .withRedirectUrl("http://101.164.144.156:" + getPortNumber() +"/callback")
-                    .withHttpServerOptions(new HttpServerOptions().setPort(8787))
+                    .withHttpServerOptions(new HttpServerOptions().setPort(Integer.parseInt(getPortNumber())))
                     .withScopes(Scope.IDENTIFY, Scope.CONNECTIONS)
                     .build();
         } else {
@@ -91,5 +98,9 @@ public class OAuth {
             }
         }
         return null;
+    }
+
+    public static void handleAuthorizedEvent(IOAuthUser user) throws RiotApiException {
+        SQLitePlayers.addSummonerIDToPlayerWithoutGuild(user, (LeagueHandler.getApi().getSummonerByName(Platform.OCE, getLeagueConnection(user).getID())).getId());
     }
 }

@@ -1,15 +1,18 @@
 package module.kalj123.skisbot.league;
 
-import com.robrua.orianna.api.core.RiotAPI;
-import com.robrua.orianna.type.core.common.Region;
-import com.robrua.orianna.type.core.common.Side;
-import com.robrua.orianna.type.core.currentgame.CurrentGame;
-import com.robrua.orianna.type.core.currentgame.Participant;
-import com.robrua.orianna.type.core.summoner.Summoner;
+import javafx.geometry.Side;
 import module.kalj123.skisbot.SkisBot;
 import module.kalj123.skisbot.config.Config;
 import module.kalj123.skisbot.config.Players;
 import module.kalj123.skisbot.oauth.OAuth;
+import net.rithms.riot.api.ApiConfig;
+import net.rithms.riot.api.RiotApi;
+import net.rithms.riot.api.RiotApiException;
+import net.rithms.riot.api.endpoints.spectator.dto.CurrentGameInfo;
+import net.rithms.riot.api.endpoints.spectator.dto.CurrentGameParticipant;
+import net.rithms.riot.api.endpoints.spectator.dto.Participant;
+import net.rithms.riot.api.endpoints.summoner.dto.Summoner;
+import net.rithms.riot.constant.Platform;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IPrivateChannel;
@@ -31,6 +34,8 @@ public class LeagueHandler {
     private LOLAdmin lolAdmin;
     private Boolean keyset = false;
 
+    public static RiotApi api;
+
 
 
     public LeagueHandler() throws IOException {
@@ -39,7 +44,7 @@ public class LeagueHandler {
 
     }
 
-    public void handler(MessageReceivedEvent event) {
+    public void handler(MessageReceivedEvent event) throws RiotApiException {
         String[] args = event.getMessage().getContent().split(" ");
         IGuild activeGuild = event.getGuild();
         switch(args[1]) {
@@ -47,11 +52,7 @@ public class LeagueHandler {
                 if (!keyset) {
                     config.getGuildBotChannel(activeGuild).sendMessage("Riot API Key is not set in config file!");
                 } else {
-
-                    if (!players.doesPlayerExist(event.getAuthor().getName(), event.getAuthor().getDiscriminator())) {
-                        config.getGuildBotChannel(activeGuild).sendMessage(players.addPlayerWithCheck(event.getAuthor()));
-                    } else
-                        config.getGuildBotChannel(activeGuild).sendMessage("You have already registered!");
+                    config.getGuildBotChannel(activeGuild).sendMessage(Players.addPlayerWithCheck(event.getAuthor(), activeGuild, api));
                 }
                 break;
             case "view":
@@ -88,10 +89,10 @@ public class LeagueHandler {
     public void startConfig(List<IGuild> guilds) {
         config = new Config(guilds);
         lolAdmin = new LOLAdmin(players, config);
-        RiotAPI.setRegion(Region.OCE);
         String key = config.getRiotAPIKey();
         if (!key.equals("")) {
-            RiotAPI.setAPIKey(config.getRiotAPIKey());
+            ApiConfig config = new ApiConfig().setKey(key);
+            api = new RiotApi(config);
             keyset = true;
         } else {
             System.out.println("Riot API key not set! League interaction limited...");
@@ -99,31 +100,31 @@ public class LeagueHandler {
         }
     }
 
-    private String viewGame(String name) {
+    private String viewGame(String name) throws RiotApiException {
         Summoner focusPlayer;
-        CurrentGame currentGame;
+        CurrentGameInfo currentGame;
         String returnString;
-        List<Participant> participants;
+        List<CurrentGameParticipant> participants;
 
-        if ((focusPlayer = players.getSummonerFromName(name))== null) {
+        if ((focusPlayer = Players.getSummonerFromName(name, api))== null) {
             return "Invalid summoner name";
         }
 
-        if ((currentGame = focusPlayer.getCurrentGame()) == null) {
+        if ((currentGame = api.getActiveGameBySummoner(Platform.OCE, focusPlayer.getId())) == null) {
             return name + " is not currently in a game";
         }
-        returnString = "```\nMap: " + currentGame.getMap() + "\nQueue Type: " + currentGame.getQueueType() + "\nGame Time: " + currentGame.getLength();
+        returnString = "```\nMap: " +   getMapName(currentGame.getMapId()) + "\nGame Mode: " + currentGame.getGameMode() + "\nGame Time: " + currentGame.getGameLength();
         participants = currentGame.getParticipants();
         returnString = returnString.concat("\n\nBLUE TEAM:");
-        for (Participant participant : participants) {
-            if (participant.getTeam().equals(Side.BLUE)) {
-                returnString = returnString.concat("\n" + participant.getChampion() + " (" + participant.getSummonerName() + ")");
+        for (CurrentGameParticipant participant : participants) {
+            if (participant.getTeamId() == 0) {
+                returnString = returnString.concat("\n" + api.getChampion(Platform.OCE, participant.getChampionId()) + " (" + participant.getSummonerName() + ")");
             }
         }
         returnString = returnString.concat("\n\nPURPLE TEAM:");
-        for (Participant participant : participants) {
-            if (participant.getTeam().equals(Side.PURPLE)) {
-                returnString = returnString.concat("\n" + participant.getChampion() + " (" + participant.getSummonerName() + ")");
+        for (CurrentGameParticipant participant : participants) {
+            if (participant.getTeamId() == 1) {
+                returnString = returnString.concat("\n" + participant.getChampionId() + " (" + participant.getSummonerName() + ")");
             }
         }
 
@@ -150,6 +151,11 @@ public class LeagueHandler {
         return "Refreshed";
     }
 
-}
+    public static RiotApi getApi() {return api;}
 
-//API key: RGAPI-ce2745b8-b516-4ce0-a49f-034dfab0155e
+    public static String getMapName(int id) {
+        String[] maps = {"0", "Summoner's Rift", "Summoner's Rift", "The Proving Grounds", "The Twisted Treeline", "5", "6", "7", "The Crystal Scar", "9", "The Twisted Treeline", "Summoner's Rift", "The Howling Abyss", "13", "The Butcher's Bridge", "15", "The Cosmic Ruins"};
+        return maps[id];
+    }
+
+}

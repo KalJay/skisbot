@@ -1,5 +1,7 @@
 package module.kalj123.skisbot;
 
+import module.kalj123.skisbot.database.SQLite;
+import module.kalj123.skisbot.database.SQLitePlayers;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IGuild;
@@ -32,6 +34,8 @@ public class SkisBot {
         if (Files.exists(tokenPath)) {
             discordClient = getClient();
             discordClient.getDispatcher().registerListener(new EventHandler());
+            SQLite.connect();
+            SQLitePlayers.connect();
         } else {
             createTokenFile();
         }

@@ -6,30 +6,25 @@ package module.kalj123.skisbot.league;
  */
 public class Player {
 
-    private final String username;
-    private final String discriminator;
-    private final long summonerID;
+    private String ID;
+    private String username;
 
-    public Player(String username, String discriminator, long summonerName) {
+    public Player(String ID, String username) {
+        this.ID = ID;
         this.username = username;
-        this.discriminator = discriminator;
-        this.summonerID = summonerName;
     }
 
     public String getUsername() {
         return username;
     }
 
-    public String getDiscriminator() {
-        return discriminator;
+    public String getID() {
+        return ID;
     }
 
-    public long getSummonerID() {
-        return summonerID;
-    }
 
     @Override
     public String toString() {
-        return username+ "," + discriminator + "," + summonerID;
+        return getID() + ", " + getUsername();
     }
 }

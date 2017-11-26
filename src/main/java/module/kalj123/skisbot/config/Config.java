@@ -1,5 +1,6 @@
 package module.kalj123.skisbot.config;
 
+import module.kalj123.skisbot.database.SQLite;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 
@@ -21,50 +22,22 @@ public class Config {
     private final String config = "config.txt"; ///module/kalj123/skisbot/resources/
     private Path configPath = Paths.get(config);
     private Charset utf8 = StandardCharsets.UTF_8;
-
-    private ArrayList<KGuild> guildList;
     private List<String>configLines;
 
     public Config(List<IGuild> guilds) {
-        guildList = new ArrayList<>();
-
-        for (IGuild guild : guilds) {
-            guildList.add(new KGuild(guild, null));
-        }
-
         if(!Files.exists(configPath)) {
                 createConfig(guilds);
         }
-
         readConfig();
     }
 
     private void readConfig() {
         try {
             configLines = Files.readAllLines(configPath, utf8);
-            for (String line : configLines) {
-                String[] lines = line.split(":");
-                for (KGuild kGuild : guildList) {
-                    if(("guild_" + kGuild.getGuild().getStringID() + "_botchannel").equals(lines[0])) {
-                        if (lines[0].equals("guild_" + kGuild.getGuild().getStringID() + "_botchannel") && !lines[1].substring(1).equals("")) {
-                            kGuild.setBotChannel(kGuild.getGuild().getChannelByID(Long.parseLong(lines[1].substring(1))));
-                        }
-                    }
-                }
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-    private void writeConfig() {
-        try {
-            Files.write(configPath, configLines, utf8);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
 
     private void createConfig(List<IGuild> guilds) {
         System.out.println("Config file not found, creating...");
@@ -74,51 +47,24 @@ public class Config {
             List<String> lines = new ArrayList<>();
             lines.add("riot_api_key:-");
             System.out.println("Please add a RIOT API key to config.txt for league interaction to function!");
-            for (IGuild guild : guilds) {
-                lines.add("guild_" + guild.getStringID() + "_botchannel:-");
-                Files.write(configPath, lines, utf8);
-                System.out.println("Added entry for guild '" + guild.getName() + "', please add a botChannel ID to this guild, unless general channel is fine");
-                guildList.add(new KGuild(guild, null));
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
     public IChannel getGuildBotChannel(IGuild guild) {
-        for (KGuild kGuild : guildList) {
-            if(kGuild.getGuild() == guild ) {
-                if (kGuild.getBotChannel() == null) {
-                    return kGuild.getGuild().getGeneralChannel();
-                }
-                return kGuild.getBotChannel();
-            }
+        String ID = SQLite.getBotChannelID(guild);
+        if (ID == null) {
+            return guild.getGeneralChannel();
         }
-        return null;
+        return guild.getChannelByID(Long.parseLong(ID));
     }
 
     public String setGuildBotChannel(IGuild guild, String channelID) {
-        if (guild.getChannelByID(Long.parseLong(channelID)) != null) {
-            for (KGuild kGuild : guildList) {
-                if (kGuild.getGuild() == guild) {
-                    kGuild.setBotChannel(guild.getChannelByID(Long.parseLong(channelID)));
-                    writeBotChannel(guild, channelID);
-                    return "Set the Bot Channel for this Guild to " + kGuild.getBotChannel().getName();
-                }
-            }
+        if (guild.getChannelByID(Long.parseLong(channelID) ) == null) {
+            return "Invalid Channel ID";
         }
-        return "Invalid ChannelID";
-    }
-
-    private void writeBotChannel(IGuild guild, String channelID) {
-        int count = 0;
-        for (String line : configLines) {
-            String[] lines = line.split(":");
-            if (lines[0].equals("guild_" + guild.getStringID() + "_botchannel")) {
-                configLines.set(count, "guild_" + guild.getStringID() + "_botchannel:-" + channelID);
-            }
-            count++;
-        }
-        writeConfig();
+        SQLite.updateBotChannel(guild, channelID);
+        return "Bot Channel updated to " + guild.getChannelByID(Long.parseLong(channelID)).getName();
     }
 
     public String getRiotAPIKey() {
